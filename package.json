@@ -1,0 +1,19 @@
+{
+  "name": "botf5",
+  "version": "1.0.0",
+  "description": "Estagiario da Force 5",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "discord.js": "^14.7.1",
+    "dotenv": "^16.0.3",
+    "mongoose": "^6.8.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "scripts": {
+    "dev": "nodemon ./src/index.js"
+  }
+}
