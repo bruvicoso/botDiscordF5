@@ -9,9 +9,9 @@ import {
 import commandsCustom from './src/commands/slashCommands.js';
 import embedCustom from './src/commands/embedMatch.js';
 import connectDB from './src/database/mongo.js';
-import BindService from './src/services/bind.js'
+import Repository from './src/database/repository.js'
 
-const { BOT_TOKEN, CLIENT_ID, DATABASE_URL } = process.env
+const { BOT_TOKEN, CLIENT_ID } = process.env
 const commands = [
   commandsCustom.MapStatus,
   commandsCustom.UpdateMap,
@@ -53,12 +53,19 @@ client.on('interactionCreate', async interaction => {
   if (interaction.commandName === 'map') {
     const mapName = interaction.options.getString('map_name')
     const status = interaction.options.getString('status')
-    
-    await interaction.reply({
-      content: `${status.toUpperCase()} no mapa ${mapName} atualizado!`,
-      embeds: [embedCustom.EmbedMatch] 
-    });
-    // await interaction.followUp({ embeds: [EmbedTotalByYear] });
+
+    let maps = await Repository.getMaps()
+
+    console.log('maps', maps)
+
+    if (maps) {
+      await interaction.reply({
+        content: `${status.toUpperCase()} no mapa ${mapName} atualizado!`,
+        embeds: [embedCustom.EmbedMatch(maps)] 
+      });
+    } else {
+      await interaction.reply({content: `Ocorreu um erro ao salvar`});
+    }
   }
 
   if (interaction.commandName === 'resume') {
@@ -66,7 +73,7 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.commandName === 'bind') {
-    let newBind = await BindService.getRandom()
+    let newBind = await Repository.getRandom()
 
     if (newBind) {
       await interaction.reply({ 
@@ -75,7 +82,7 @@ client.on('interactionCreate', async interaction => {
         ] 
       });
     } else {
-      console.error('newBindNotFound', newBind)
+      await interaction.reply({content: `Ocorreu um erro`});
     }
   }
 
