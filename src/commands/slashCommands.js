@@ -17,9 +17,13 @@ const mapsName = [
   { name: 'Vertigo', value: 'vertigo' }
 ]
 
+const ListMaps = await new SlashCommandBuilder()
+  .setName("list_maps")
+  .setDescription("Send the statistics")
+
 const MapStatus = await new SlashCommandBuilder()
   .setName("map")
-  .setDescription("Send the statistics")
+  .setDescription("Enviar as estatísticas das partidas!")
   .addStringOption(option =>
     option.setName("map_name")
       .setDescription("Qual é o mapa?")
@@ -77,4 +81,4 @@ const BindAdd = await new SlashCommandBuilder()
       .setDescription("Quem foi o autor?")
       .setRequired(true))
 
-export default { MapStatus, UpdateMap, Resume, Bind, BindAdd }
+export default { MapStatus, UpdateMap, Resume, Bind, BindAdd, ListMaps }

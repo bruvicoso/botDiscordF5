@@ -17,7 +17,8 @@ const commands = [
   commandsCustom.UpdateMap,
   commandsCustom.Resume,
   commandsCustom.Bind,
-  commandsCustom.BindAdd
+  commandsCustom.BindAdd,
+  commandsCustom.ListMaps
 ];
 const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
 
@@ -49,6 +50,20 @@ client.on('ready', () => {
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === 'list_maps') {
+    try {
+      await interaction.reply({
+            embeds: [embedCustom.EmbedMatch(
+              await Repository.getMatchs()
+            )] 
+          });
+    } catch (error) {
+      await interaction.reply({
+        content: `Erro ao salvar! - ${error}`
+      });
+    }
+  }
 
   if (interaction.commandName === 'map') {
      try {

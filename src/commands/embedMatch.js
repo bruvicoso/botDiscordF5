@@ -7,7 +7,7 @@ const positiveColor = '#1b7e48'
 const thumbPositive = 'https://media.tenor.com/QK0jqC7t2FQAAAAj/poggers-pog.gif'
 const thumbNegative = 'https://media.tenor.com/gWs0s8QlsUgAAAAC/pepe-peppo.gif'
 
-function EmbedMatch(maps, status = 'te') {
+function EmbedMatch(maps) {
     let objMaps = []
     maps.forEach(mapCs => {
         objMaps = [...objMaps,
