@@ -52,22 +52,41 @@ client.on('interactionCreate', async interaction => {
 
   if (interaction.commandName === 'map') {
      try {
-      let params = {
+      const params = {
         mapId: interaction.options.getString('map_name'),
         status: interaction.options.getString('status')
       }
-      await Repository.saveMatch(params)
 
-      // if (maps) {
-      //   await interaction.reply({
-      //     content: `${status.toUpperCase()} no mapa ${mapName} atualizado!`,
-      //     embeds: [embedCustom.EmbedMatch(
-      //       await Repository.getMatchs()
-      //     )] 
-      //   });
-      // } else {
-        await interaction.reply({content: `Ocorreu um erro ao salvar`});
-      // }
+      await Repository.updateOneMatch(params)
+      await interaction.reply({
+        content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado!`,
+        embeds: [embedCustom.EmbedMatch(
+          await Repository.getMatchs()
+        )] 
+      });
+    } catch (error) {
+      await interaction.reply({
+        content: `Erro ao salvar! - ${error}`
+      });
+    }
+  }
+
+  if (interaction.commandName === 'update_map') {
+    try {
+      const params = {
+        mapId: interaction.options.getString('map_name'),
+        win: interaction.options.getInteger('win'),
+        lose: interaction.options.getInteger('lose')
+      }
+
+      await Repository.updateStatusMatch(params)
+      await interaction.reply({
+        content: `Update Realizado!`,
+        embeds: [embedCustom.EmbedMatch(
+            await Repository.getMatchs()
+          )]
+      });
+
     } catch (error) {
       await interaction.reply({
         content: `Erro ao salvar! - ${error}`
@@ -76,7 +95,8 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.commandName === 'resume') {
-    await interaction.reply({ embeds: [embedCustom.EmbedTotalByYear] });
+    const resume = await Repository.resumeByYear()
+    await interaction.reply({ embeds: [embedCustom.EmbedTotalByYear(resume)] });
   }
 
   if (interaction.commandName === 'bind') {
@@ -112,12 +132,6 @@ client.on('interactionCreate', async interaction => {
         content: `Erro ao salvar! - ${error}`
       });
     }
-  }
-
-  if (interaction.commandName === 'update_map') {
-    const data = interaction.options.get('update_map')
-    
-		await interaction.reply({ content: 'Update Realizado!', embeds: [embedCustom.EmbedMatch] });
   }
 });
 

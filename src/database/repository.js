@@ -31,7 +31,7 @@ async function listYear(year = '2023') {
 async function getMatchs() {
     return await schema.Match
         .find()
-        .sort({updatedAt: -1})
+        .sort({winrate: -1})
         .limit(7)
         .exec()
 }
@@ -44,7 +44,7 @@ async function saveBind(params) {
     })).save()
 }
 
-async function saveMatch(params) {
+async function updateOneMatch(params) {
     const match = (await schema.Match
         .findOne({
             mapId: params.mapId,
@@ -59,11 +59,7 @@ async function saveMatch(params) {
     const winrate = match.win / total * 100 
 
     if (match.mapName === undefined) {
-        const map = await schema.Maps
-            .findOne({
-                value: params.mapId
-            })
-            .exec()
+        const map = await schema.Maps.findOne({value: params.mapId}).exec()
         
         return await (new schema.Match({
             mapId:   map.value,
@@ -83,6 +79,71 @@ async function saveMatch(params) {
     });
 }
 
+async function updateStatusMatch(params) {
+    const match = (await schema.Match
+        .findOne({
+            mapId: params.mapId,
+            createdAt: {
+                $gte: new Date(new Date().getFullYear(), 0, 1)
+            }
+        })
+        .exec()) || {win: params.win, lose: params.lose}
+
+    const total = match.win + match.lose
+    const winrate = match.win / total * 100 
+
+    if (match.mapName === undefined) {
+        const map = await schema.Maps.findOne({value: params.mapId}).exec()
+        
+        return await (new schema.Match({
+            mapId:   map.value,
+            mapName: map.name,
+            win:     parseInt(params.win),
+            lose:    parseInt(params.lose),
+            winrate: winrate.toFixed(2)
+        })).save()
+    }
+
+    return await schema.Match.findByIdAndUpdate(match._id, 
+    {
+        win:     parseInt(params.win),
+        lose:    parseInt(params.lose),
+        winrate: winrate.toFixed(2)
+    });
+}
+
+async function resumeByYear() {
+    const mapsStatus = (await schema.Match
+        .aggregate([{
+            $facet: {
+                worseMap: [{ $sort: { winrate:  1 } }, { $limit: 1 }],
+                bestMap: [{ $sort: { winrate: -1 } }, { $limit: 1 }] 
+            }
+        }])
+        .exec())
+
+    const winRate = (await schema.Match
+        .aggregate([{
+            $group: {
+                _id: null,
+                totalWin: { $sum: { $sum: "$win" } },
+                totalLose: { $sum: { $sum: "$lose" } },
+            }
+        }])
+        .exec())
+
+    const total = winRate[0]?.totalWin || 0 + winRate[0]?.totalLose || 0
+    const winrate = winRate[0]?.totalWin || 0 / total * 100
+    
+    return {
+        bestMap: mapsStatus[0]?.bestMap[0]?.mapName || {},
+        worseMap: mapsStatus[0]?.worseMap[0]?.mapName || {},
+        totalWin: winRate[0]?.totalWin || {},
+        totalLose: winRate[0]?.totalLose || {},
+        winrate
+    }
+}
+
 async function getAllMaps() {
     return await schema.Maps
         .find({}, '-_id')
@@ -95,6 +156,8 @@ export default {
     listYear,
     getMatchs,
     saveBind,
-    saveMatch,
-    getAllMaps
+    updateOneMatch,
+    updateStatusMatch,
+    getAllMaps,
+    resumeByYear
 }
