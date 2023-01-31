@@ -19,7 +19,7 @@ function EmbedMatch(maps, status = 'te') {
 
     return new EmbedBuilder()
     .setTitle("Partidas de 2023")
-    .setDescription('As partidas estão ordenadas pelo Winrate')
+    .setDescription('As partidas estão ordenadas pelo Win Rate')
     .setColor(alertColor)
     .setFields(
         { name: ' ', value: ' ', inline: true },
@@ -28,7 +28,7 @@ function EmbedMatch(maps, status = 'te') {
         ...objMaps
     )
     .setFooter(
-        { text: 'Ultimos 7 mapas jogados!'}
+        { text: 'Limite de 7 mapas!'}
     )
 }
 
