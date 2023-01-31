@@ -51,20 +51,27 @@ client.on('interactionCreate', async interaction => {
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === 'map') {
-    const mapName = interaction.options.getString('map_name')
-    const status = interaction.options.getString('status')
+     try {
+      let params = {
+        mapId: interaction.options.getString('map_name'),
+        status: interaction.options.getString('status')
+      }
+      await Repository.saveMatch(params)
 
-    let maps = await Repository.getMaps()
-
-    console.log('maps', maps)
-
-    if (maps) {
+      // if (maps) {
+      //   await interaction.reply({
+      //     content: `${status.toUpperCase()} no mapa ${mapName} atualizado!`,
+      //     embeds: [embedCustom.EmbedMatch(
+      //       await Repository.getMatchs()
+      //     )] 
+      //   });
+      // } else {
+        await interaction.reply({content: `Ocorreu um erro ao salvar`});
+      // }
+    } catch (error) {
       await interaction.reply({
-        content: `${status.toUpperCase()} no mapa ${mapName} atualizado!`,
-        embeds: [embedCustom.EmbedMatch(maps)] 
+        content: `Erro ao salvar! - ${error}`
       });
-    } else {
-      await interaction.reply({content: `Ocorreu um erro ao salvar`});
     }
   }
 
@@ -73,12 +80,12 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.commandName === 'bind') {
-    let newBind = await Repository.getRandom()
+    let randomBind = await Repository.getRandom()
 
-    if (newBind) {
+    if (randomBind) {
       await interaction.reply({ 
         embeds: [
-          embedCustom.BindRandom(newBind)
+          embedCustom.ShowBind(randomBind)
         ] 
       });
     } else {
@@ -87,7 +94,24 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.commandName === 'bind_add') {
-    await interaction.reply({ embeds: [embedCustom.BindRandom] });
+    try {
+      const params = {
+        bind: interaction.options.getString('message'),
+        author: interaction.options.getString('author')
+      }
+
+      let newBind = await Repository.saveBind(params)
+      await interaction.reply({
+        content: `Salvo com sucesso!`,
+        embeds: [
+          embedCustom.ShowBind(newBind)
+        ] 
+      });  
+    } catch (error) {
+      await interaction.reply({
+        content: `Erro ao salvar! - ${error}`
+      });
+    }
   }
 
   if (interaction.commandName === 'update_map') {

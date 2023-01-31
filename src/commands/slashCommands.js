@@ -1,5 +1,21 @@
 import { SlashCommandBuilder } from "discord.js"
-import MapsName from "./mapName.js";
+import Repository from './../database/repository.js'
+
+// const mapsName = await Repository.getAllMaps()
+
+const mapsName = [
+  { name: 'Ancient', value: 'ancient' },
+  { name: 'Anubis', value: 'anubis' },
+  { name: 'Cache', value: 'cache' },
+  { name: 'Cobblestone', value: 'cobble' },
+  { name: 'Dust 2', value: 'dust2' },
+  { name: 'Inferno', value: 'inferno' },
+  { name: 'Mirage', value: 'mirage' },
+  { name: 'Nuke', value: 'nuke' },
+  { name: 'Overpass', value: 'overpass' },
+  { name: 'Train', value: 'train' },
+  { name: 'Vertigo', value: 'vertigo' }
+]
 
 const MapStatus = await new SlashCommandBuilder()
   .setName("map")
@@ -8,7 +24,7 @@ const MapStatus = await new SlashCommandBuilder()
     option.setName("map_name")
       .setDescription("Qual é o mapa?")
       .setRequired(true)
-      .setChoices(...MapsName))
+      .setChoices(...mapsName))
   .addStringOption(option =>
     option.setName("status")
       .setDescription("Qual é o status?")
@@ -31,7 +47,7 @@ const UpdateMap = await new SlashCommandBuilder()
 		option.setName("map_name")
       .setDescription("Qual é o mapa?")
       .setRequired(true)
-      .setChoices(...MapsName))
+      .setChoices(...mapsName))
   .addIntegerOption(option =>
 		option.setName("win")
       .setDescription("Quantas vitórias?")

@@ -35,7 +35,7 @@ function EmbedMatch(maps) {
 function EmbedTotalByYear(params) {
     const winRate = params.totalWin / params.totalMatch * 100
     return new EmbedBuilder()
-    .setTitle('Resumo de 2023')
+    .setTitle(`Resumo de ${params.year}`)
     .setDescription(`Winrate: ${winRate}`)
     .setColor(winRate >= 50 ? positiveColor : negativeColor)
     .setFields(
@@ -49,7 +49,7 @@ function EmbedTotalByYear(params) {
     .setThumbnail(thumbNegative)
 }
 
-function BindRandom(params) {
+function ShowBind(params) {
     return new EmbedBuilder()
         .setColor(alertColor)
         .setFields(
@@ -60,13 +60,4 @@ function BindRandom(params) {
         )
 }
 
-// const BindRandom = new EmbedBuilder()
-//     .setColor(alertColor)
-//     .setFields(
-//         { name: '(_Contexto: Perdendo de 13x0, o time em silencio a um tempo pic velório_)\nVocês viram o aquário que quebrou em Berlin ?', value: 'ego, Dhi' }
-//     )
-//     .setFooter(
-//         { text: '2022'}
-//     )
-
-export default { EmbedMatch, EmbedTotalByYear, BindRandom }
+export default { EmbedMatch, EmbedTotalByYear, ShowBind }
