@@ -144,6 +144,31 @@ async function resumeByYear() {
     }
 }
 
+async function listExecByMap(mapId) {
+    return await schema.Match.findOne({mapId: params.mapId}).exec();
+}
+
+async function saveExecListByMap(params) {
+    const match = (await schema.Exec
+        .findOne({mapId: params.mapId})
+        .exec())
+
+    if (match.mapName === undefined) {
+        const map = await schema.Maps.findOne({value: params.mapId}).exec()
+
+        console.log('map:', map);
+        
+        return await (new schema.Match({
+            mapId:      map.value,
+            mapName:    map.name,
+            playlist:   params.playlist,
+            timestamps: true
+        })).save()
+    }
+
+    return await schema.Match.findByIdAndUpdate(match._id, {playlist: rams.playlist});
+}
+
 async function getAllMaps() {
     return await schema.Maps
         .find({}, '-_id')
@@ -158,6 +183,8 @@ export default {
     saveBind,
     updateOneMatch,
     updateStatusMatch,
+    listExecByMap,
+    saveExecListByMap,
     getAllMaps,
     resumeByYear
 }

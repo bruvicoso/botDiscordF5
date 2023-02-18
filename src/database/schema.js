@@ -28,9 +28,15 @@ const mapSchema = new Schema({
     value: {type: String, require: true},
 }, { timestamp: true })
 
+const execSchema = new Schema({
+    mapId:  {type: String, require: true},
+    value: {type: String, require: true},
+}, { timestamp: true })
+
 const Bind = model('binds', bindSchema)
 const Match = model('matchs', matchSchema)
 const Maps = model('maps', mapSchema)
+const Exec = model('exec', execSchema)
 
 export default { 
     Bind,
@@ -38,5 +44,7 @@ export default {
     Match,
     matchSchema,
     Maps,
-    mapSchema
+    mapSchema,
+    Exec,
+    mapExecSchema
 }

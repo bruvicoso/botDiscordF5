@@ -37,8 +37,9 @@ const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.GuildMessageReactions
   ]
 });
 
@@ -74,10 +75,16 @@ client.on('interactionCreate', async interaction => {
 
       await Repository.updateOneMatch(params)
       await interaction.reply({
-        content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado!`,
+        content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado! _Delete em 30s_`,
         embeds: [embedCustom.EmbedMatch(
           await Repository.getMatchs()
         )] 
+      })
+      .then(() => {
+        setTimeout(() => interaction.deleteReply(), 30000)
+      })
+      .catch(collected => {
+        message.reply('Ocorreu um erro');
       });
     } catch (error) {
       await interaction.reply({
@@ -111,24 +118,39 @@ client.on('interactionCreate', async interaction => {
 
   if (interaction.commandName === 'resume') {
     const resume = await Repository.resumeByYear()
-    await interaction.reply({ embeds: [embedCustom.EmbedTotalByYear(resume)] });
+    await interaction.reply(interaction.reply({
+        content: `Autodestruição em 30s`,
+        embeds: [embedCustom.EmbedTotalByYear(resume)]
+      }))
+      .then(() => {
+        setTimeout(() => interaction.deleteReply(), 30000)
+      })
+      .catch(collected => {
+        message.reply('Ocorreu um erro');
+      });
   }
 
   if (interaction.commandName === 'bind') {
     let randomBind = await Repository.getRandom()
 
     if (randomBind) {
-      await interaction.reply({ 
+      await interaction.reply({
+        content: `Autodestruição em 30s`,
         embeds: [
           embedCustom.ShowBind(randomBind)
-        ] 
+        ]
+      }).then(() => {
+        setTimeout(() => interaction.deleteReply(), 30000)
+      })
+      .catch(collected => {
+        message.reply('Ocorreu um erro');
       });
     } else {
       await interaction.reply({content: `Ocorreu um erro`});
     }
   }
 
-  if (interaction.commandName === 'bind_add') {
+  if (interaction.commandName === 'add_bind') {
     try {
       const params = {
         bind: interaction.options.getString('message'),
@@ -148,13 +170,79 @@ client.on('interactionCreate', async interaction => {
       });
     }
   }
+
+  if (interaction.commandName === 'exec') {
+     try {
+      const mapId = interaction.options.getString('map_name')
+
+      await interaction.reply({
+        content: `Playlist no mapa ${params.mapId}!`,
+        embeds: [embedCustom.EmbedMatch(
+          await Repository.listExecByMap(mapId)
+        )] 
+      })
+    } catch (error) {
+      await interaction.reply({
+        content: `Erro ao salvar! - ${error}`
+      });
+    }
+  }
+
+  if (interaction.commandName === 'add_exec') {
+    try {
+      const params = {
+        mapId:    interaction.options.getString('map_name'),
+        playlist: interaction.options.getString('playlist')
+      }
+
+      await Repository.saveExecListByMap(params)
+
+      let newBind = await Repository.saveBind(params)
+      await interaction.reply({
+        content: `Salvo com sucesso!`,
+        embeds: [
+          embedCustom.ShowBind(newBind)
+        ] 
+      });  
+    } catch (error) {
+      await interaction.reply({
+        content: `Erro ao salvar! - ${error}`
+      });
+    }
+  }
+
+
 });
 
-client.on('messageCreate', (message) => {
-  return
-  if (message.author.bot) return;
+client.on('messageReactionAdd', (reaction, user) => {
+  // if (reaction.message.content == '<@&913202088647999538>') {}
+  console.log('Count: ', reaction.count)
+  console.log(reaction)
 
-  console.log(message.content)
+  let countReactions = 0
 
-  message.channel.send('Hello')
+  reaction.message.awaitReactions({ max: 2, time: 60000, errors: ['time'] })
+	.then(collected => {
+		// const reaction = collected.first();
+    console.log('collected', collected)
+		countReactions++
+    console.log(countReactions)
+	})
+	.catch(collected => {
+		message.reply('you reacted with neither a thumbs up, nor a thumbs down.');
+	});
+
+
+  // let count = 1
+  // console.log(reaction.message.reactions.map(react => {
+  //   console.log(`Mensagem numero: ${count++}`)
+  //   console.log(react.message.content)
+  // }))
+  // console.log(`O usuário com o ID ${user.id} reagiu à mensagem com a reação: ${reaction.emoji.name}`);
+});
+
+client.on('messageReactionRemove', (reaction, user) => {
+  console.log(reaction.message.content == '@Valorantzão')
+  console.log(`O usuário com o ID ${user.id} reagiu à mensagem com a reação: ${reaction.emoji.name}`);
+  reaction.message.channel.send(`iiiii ala, Desistiu?! <@${user.id}>`)
 });

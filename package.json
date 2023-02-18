@@ -10,9 +10,6 @@
     "dotenv": "^16.0.3",
     "mongoose": "^6.8.4"
   },
-  "devDependencies": {
-    "nodemon": "^2.0.20"
-  },
   "scripts": {
     "dev": "nodemon ./src/index.js"
   }
