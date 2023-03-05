@@ -30,7 +30,8 @@ const mapSchema = new Schema({
 
 const execSchema = new Schema({
     mapId:  {type: String, require: true},
-    value: {type: String, require: true},
+    playlist: {type: String, require: true},
+    description: {type: String, require: true},
 }, { timestamp: true })
 
 const Bind = model('binds', bindSchema)
@@ -46,5 +47,5 @@ export default {
     Maps,
     mapSchema,
     Exec,
-    mapExecSchema
+    execSchema
 }

@@ -59,7 +59,7 @@ async function updateOneMatch(params) {
     const winrate = match.win / total * 100 
 
     if (match.mapName === undefined) {
-        const map = await schema.Maps.findOne({value: params.mapId}).exec()
+        const map = await findMapById(params.mapId)
         
         return await (new schema.Match({
             mapId:   map.value,
@@ -79,6 +79,10 @@ async function updateOneMatch(params) {
     });
 }
 
+async function findMapById(mapId) {
+    return await schema.Maps.findOne({value: mapId}).exec()
+}
+
 async function updateStatusMatch(params) {
     const match = (await schema.Match
         .findOne({
@@ -93,7 +97,7 @@ async function updateStatusMatch(params) {
     const winrate = match.win / total * 100 
 
     if (match.mapName === undefined) {
-        const map = await schema.Maps.findOne({value: params.mapId}).exec()
+        const map = await findMapById(params.mapId)
         
         return await (new schema.Match({
             mapId:   map.value,
@@ -145,28 +149,25 @@ async function resumeByYear() {
 }
 
 async function listExecByMap(mapId) {
-    return await schema.Match.findOne({mapId: params.mapId}).exec();
+    let execs = await schema.Exec
+    .find({mapId}, '-_id')
+    .sort({value: 1})
+    .exec()
+
+    if (execs.length === 0) {
+        throw new Error('Não foi encontrado registro nesse mapa!')
+    }
+
+    return execs
 }
 
 async function saveExecListByMap(params) {
-    const match = (await schema.Exec
-        .findOne({mapId: params.mapId})
-        .exec())
-
-    if (match.mapName === undefined) {
-        const map = await schema.Maps.findOne({value: params.mapId}).exec()
-
-        console.log('map:', map);
-        
-        return await (new schema.Match({
-            mapId:      map.value,
-            mapName:    map.name,
-            playlist:   params.playlist,
-            timestamps: true
-        })).save()
-    }
-
-    return await schema.Match.findByIdAndUpdate(match._id, {playlist: rams.playlist});
+    return await (new schema.Exec({
+        mapId:       params.mapId,
+        playlist:    params.playlist,
+        description: params.description,
+        timestamps:  true
+    })).save()
 }
 
 async function getAllMaps() {
@@ -185,6 +186,7 @@ export default {
     updateStatusMatch,
     listExecByMap,
     saveExecListByMap,
+    findMapById,
     getAllMaps,
     resumeByYear
 }

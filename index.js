@@ -12,13 +12,17 @@ import connectDB from './src/database/mongo.js';
 import Repository from './src/database/repository.js'
 
 const { BOT_TOKEN, CLIENT_ID } = process.env
+connectDB
+
 const commands = [
   commandsCustom.MapStatus,
   commandsCustom.UpdateMap,
   commandsCustom.Resume,
   commandsCustom.Bind,
   commandsCustom.BindAdd,
-  commandsCustom.ListMaps
+  commandsCustom.ListMaps,
+  commandsCustom.Exec,
+  commandsCustom.ExecList
 ];
 const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
 
@@ -42,8 +46,6 @@ const client = new Client({
     GatewayIntentBits.GuildMessageReactions
   ]
 });
-
-connectDB
 
 client.on('ready', () => {
   console.log("Bot online 🚀")
@@ -173,17 +175,18 @@ client.on('interactionCreate', async interaction => {
 
   if (interaction.commandName === 'exec') {
      try {
-      const mapId = interaction.options.getString('map_name')
+      const mapId = interaction.options.getString('map_playlist')
 
+      const map = await Repository.findMapById(mapId)
       await interaction.reply({
-        content: `Playlist no mapa ${params.mapId}!`,
-        embeds: [embedCustom.EmbedMatch(
+        embeds: [embedCustom.EmbedExec(
+          map.name,
           await Repository.listExecByMap(mapId)
         )] 
       })
     } catch (error) {
       await interaction.reply({
-        content: `Erro ao salvar! - ${error}`
+        content: `${error}`
       });
     }
   }
@@ -191,18 +194,14 @@ client.on('interactionCreate', async interaction => {
   if (interaction.commandName === 'add_exec') {
     try {
       const params = {
-        mapId:    interaction.options.getString('map_name'),
-        playlist: interaction.options.getString('playlist')
+        mapId:    interaction.options.getString('map_exec'),
+        playlist: interaction.options.getString('playlist'),
+        description: interaction.options.getString('description'),
       }
 
       await Repository.saveExecListByMap(params)
-
-      let newBind = await Repository.saveBind(params)
       await interaction.reply({
-        content: `Salvo com sucesso!`,
-        embeds: [
-          embedCustom.ShowBind(newBind)
-        ] 
+        content: `Salvo com sucesso!\nExecute o comando /exec para listar as execuções salvas.`,
       });  
     } catch (error) {
       await interaction.reply({
@@ -210,8 +209,6 @@ client.on('interactionCreate', async interaction => {
       });
     }
   }
-
-
 });
 
 client.on('messageReactionAdd', (reaction, user) => {

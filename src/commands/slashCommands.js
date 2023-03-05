@@ -70,7 +70,7 @@ const Bind = await new SlashCommandBuilder()
   .setDescription("Pegar uma bind random!")
 
 const BindAdd = await new SlashCommandBuilder()
-  .setName("bind_add")
+  .setName("add_bind")
   .setDescription("Adicionar uma nova Bind!")
   .addStringOption(option =>
 		option.setName("message")
@@ -81,4 +81,39 @@ const BindAdd = await new SlashCommandBuilder()
       .setDescription("Quem foi o autor?")
       .setRequired(true))
 
-export default { MapStatus, UpdateMap, Resume, Bind, BindAdd, ListMaps }
+const Exec = await new SlashCommandBuilder()
+  .setName("exec")
+  .setDescription("Mostrar execução em um mapa especifico!")
+  .addStringOption(option =>
+		option.setName("map_playlist")
+      .setDescription("Qual mapa?")
+      .setRequired(true)
+      .setChoices(...mapsName))
+
+const ExecList = await new SlashCommandBuilder()
+  .setName("add_exec")
+  .setDescription("Adicionar um link de execução!")
+  .addStringOption(option =>
+		option.setName("map_exec")
+      .setDescription("Qual é o mapa?")
+      .setRequired(true)
+      .setChoices(...mapsName))
+  .addStringOption(option =>
+		option.setName("description")
+      .setDescription("Uma breve descrição da execução.")
+      .setRequired(true))
+  .addStringOption(option =>
+		option.setName("playlist")
+      .setDescription("Link da playlist.")
+      .setRequired(true))
+
+export default { 
+  MapStatus,
+  UpdateMap,
+  Resume,
+  Bind,
+  BindAdd,
+  Exec,
+  ExecList,
+  ListMaps
+}

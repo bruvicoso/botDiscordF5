@@ -55,8 +55,33 @@ function ShowBind(params) {
             { name: params.bind, value: params.author }
         )
         .setFooter(
-            { text:params.year}
+            { text:params.year }
         )
 }
 
-export default { EmbedMatch, EmbedTotalByYear, ShowBind }
+function EmbedExec(mapName, execs) {
+    let objExecs = []
+    execs.forEach(exec => {
+        objExecs = [...objExecs,
+            { name: ' ', value: `${exec.description}`, inline: true },
+            { name: ' ', value: `${exec.playlist}`, inline: true },
+            { name: ' ', value: ' ', inline: true },
+        ]
+    })
+
+    return new EmbedBuilder()
+    .setTitle(`_${mapName}_ \n*Playlist no mapa*`)
+    .setDescription('\0')
+    .setColor('#FFC0CB')
+    .setFields(
+        { name: 'Descrição', value: ' ', inline: true },
+        { name: 'Link', value: ' ', inline: true },
+        { name: ' ', value: ' ', inline: true },
+        ...objExecs
+    )
+    .setFooter(
+        { text: '*Mostra apenas 7 execs por mapa!'}
+    )
+}
+
+export default { EmbedMatch, EmbedTotalByYear, EmbedExec, ShowBind }
