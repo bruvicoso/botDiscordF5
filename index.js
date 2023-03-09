@@ -238,8 +238,8 @@ client.on('messageReactionAdd', (reaction, user) => {
   // console.log(`O usuário com o ID ${user.id} reagiu à mensagem com a reação: ${reaction.emoji.name}`);
 });
 
-client.on('messageReactionRemove', (reaction, user) => {
-  console.log(reaction.message.content == '@Valorantzão')
-  console.log(`O usuário com o ID ${user.id} reagiu à mensagem com a reação: ${reaction.emoji.name}`);
-  reaction.message.channel.send(`iiiii ala, Desistiu?! <@${user.id}>`)
-});
+// client.on('messageReactionRemove', (reaction, user) => {
+//   console.log(reaction.message.content == '@cs')
+//   console.log(`O usuário com o ID ${user.id} reagiu à mensagem com a reação: ${reaction.emoji.name}`);
+//   reaction.message.channel.send(`iiiii ala, Desistiu?! <@${user.id}>`)
+// });
