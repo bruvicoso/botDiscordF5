@@ -120,15 +120,15 @@ client.on('interactionCreate', async interaction => {
 
   if (interaction.commandName === 'resume') {
     const resume = await Repository.resumeByYear()
-    await interaction.reply(interaction.reply({
+    await interaction.reply({
         content: `Autodestruição em 30s`,
         embeds: [embedCustom.EmbedTotalByYear(resume)]
-      }))
+      })
       .then(() => {
         setTimeout(() => interaction.deleteReply(), 30000)
       })
       .catch(collected => {
-        message.reply('Ocorreu um erro');
+        console.log(collected);
       });
   }
 

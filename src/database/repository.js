@@ -136,8 +136,10 @@ async function resumeByYear() {
         }])
         .exec())
 
-    const total = winRate[0]?.totalWin || 0 + winRate[0]?.totalLose || 0
-    const winrate = winRate[0]?.totalWin || 0 / total * 100
+    const win = winRate[0]?.totalWin || 0
+    const lose = winRate[0]?.totalLose || 0
+    const total = win + lose
+    const winrate = (win / total * 100).toFixed(2)
     
     return {
         bestMap: mapsStatus[0]?.bestMap[0]?.mapName || {},
