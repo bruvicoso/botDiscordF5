@@ -77,16 +77,13 @@ client.on('interactionCreate', async interaction => {
 
       await Repository.updateOneMatch(params)
       await interaction.reply({
-        content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado! _Delete em 30s_`,
+        content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado!`,
         embeds: [embedCustom.EmbedMatch(
           await Repository.getMatchs()
         )] 
       })
-      .then(() => {
-        setTimeout(() => interaction.deleteReply(), 30000)
-      })
       .catch(collected => {
-        message.reply('Ocorreu um erro');
+        console.log(`Ocorreu um erro: ${collected}`);
       });
     } catch (error) {
       await interaction.reply({
