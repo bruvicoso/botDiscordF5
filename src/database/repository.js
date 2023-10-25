@@ -79,6 +79,57 @@ async function updateOneMatch(params) {
     });
 }
 
+async function saveMatchTemp(params) {
+    const match = await (new schema.MatchsApprove({
+        mapId: params.mapId.split('_')[1],
+        win: params.win,
+        steamId: params.steamId
+    })).save()
+    
+    return match._id.toString()
+}
+
+async function getMatchTemp(id) {
+    return await schema.MatchsApprove.findById(id).exec()
+}
+
+async function deleteMatchTemp(id) {
+    return await schema.MatchsApprove.deleteOne({_id: id})
+}
+
+async function saveStatsPlayer(params) {
+    const player = (await schema.PlayerStats
+        .findOne({
+            steamId: params.steamId
+        })
+        .exec())
+
+    if (player && player[params.map]) {
+        stats = params.stats.map((stat, index) => {
+            return player.statsMaps[params.map][index] + stat
+        })
+
+        let payload = `{
+            steamId: ${params.steamid},
+            nick:    ${params.name},
+            statsMap: {
+                ${params.map.split('_')[1]}: ${stats}
+            }
+        }`
+
+        return await schema.PlayerStats.findByIdAndUpdate(match._id, JSON.parse(payload));
+    }
+
+    let payload = `{
+        steamId: ${params.steamid},
+        nick:    ${params.name},
+        statsMap: {
+            ${params.map.split('_')[1]}: ${params.stats}
+        }
+    }`
+    return await (new schema.PlayerStats(JSON.parse(payload))).save()
+}
+
 async function findMapById(mapId) {
     return await schema.Maps.findOne({value: mapId}).exec()
 }
@@ -185,6 +236,10 @@ export default {
     getMatchs,
     saveBind,
     updateOneMatch,
+    saveMatchTemp,
+    getMatchTemp,
+    deleteMatchTemp,
+    saveStatsPlayer,
     updateStatusMatch,
     listExecByMap,
     saveExecListByMap,

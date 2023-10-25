@@ -6,32 +6,20 @@ import {
   Routes,
 } from "discord.js";
 
-import commandsCustom from './src/commands/slashCommands.js';
-import embedCustom from './src/commands/embedMatch.js';
 import connectDB from './src/database/mongo.js';
 import Repository from './src/database/repository.js'
+import embedCustom from './src/commands/embedMatch.js';
+import commandsCustom from './src/commands/slashCommands.js';
+import GSI from './src/service/gsi/index.js'
 
 const { BOT_TOKEN, CLIENT_ID } = process.env
-connectDB
 
-const commands = [
-  commandsCustom.MapStatus,
-  commandsCustom.UpdateMap,
-  commandsCustom.Resume,
-  commandsCustom.Bind,
-  commandsCustom.BindAdd,
-  commandsCustom.ListMaps,
-  commandsCustom.Exec,
-  commandsCustom.ExecList
-];
 const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
 
 (async () => {
   try {
-    console.log('Started refreshing application (/) commands.');
+    const commands = await commandsCustom
     await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
-    console.log('Successfully reloaded application (/) commands.');
-
     client.login(BOT_TOKEN);
   } catch (error) {
     console.error(error);
@@ -49,9 +37,54 @@ const client = new Client({
 
 client.on('ready', () => {
   console.log("Bot online 🚀")
+  GSI.wsGame(client)
 });
 
 client.on('interactionCreate', async interaction => {
+  if (interaction.isButton()) {
+
+    if (interaction.message) {
+      await interaction.message.delete();
+    }
+    const buttonId = interaction.customId.split('-')[0]
+    const matchId = interaction.customId.split('-')[1]
+
+    if (buttonId === 'confirm') {
+      try {
+        const match = await Repository.getMatchTemp(matchId)
+        if (!match) {
+          return await interaction.reply({
+            content: `Partida temporaria não encontrada!`
+          });
+        }
+
+        const params = {
+          mapId: match.mapId,
+          status: match.win ? 'vitoria' : 'derrota'
+        }
+
+        await Repository.updateOneMatch(params)
+        await interaction.reply({
+          content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado!`,
+          embeds: [embedCustom.EmbedMatch(
+            await Repository.getMatchs()
+          )] 
+        })
+        .catch(collected => {
+          return interaction.reply({
+            content: `Erro ao salvar! - ${collected}`
+          });
+        });
+      } catch (error) {
+        return await interaction.reply({
+          content: `Erro ao salvar! - ${error}`
+        });
+      }
+    }
+
+    Repository.deleteMatchTemp(matchId)
+    return;
+  }
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === 'list_maps') {
