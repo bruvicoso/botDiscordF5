@@ -104,34 +104,55 @@ async function saveStatsPlayer(params) {
         })
         .exec())
 
-    if (player && player[params.map]) {
-        stats = params.stats.map((stat, index) => {
-            return player.statsMaps[params.map][index] + stat
-        })
+    if (player) {
+        console.log("Finded player")
 
-        let payload = `{
-            steamId: ${params.steamid},
-            nick:    ${params.name},
-            statsMap: {
-                ${params.map.split('_')[1]}: ${stats}
-            }
-        }`
+        let stats = params.stats
+        if (player.statsMap[params.map]) {
+            stats = {}
+            Object.keys(params.stats).forEach(key => {
+                if (player.statsMap[params.map].hasOwnProperty(key)) {
+                    stats[key] = params.stats[key] + player.statsMap[params.map][key]
+                }
+            })
+        }
 
-        return await schema.PlayerStats.findByIdAndUpdate(match._id, JSON.parse(payload));
+        stats.kd = calcKD(stats)
+        stats.kda = calcKDA(stats)
+
+        player.statsMap[params.map] = stats
+        return await schema.PlayerStats.findByIdAndUpdate(player._id, player);
     }
 
-    let payload = `{
-        steamId: ${params.steamid},
-        nick:    ${params.name},
-        statsMap: {
-            ${params.map.split('_')[1]}: ${params.stats}
+    console.log("Creating a new player stats...")
+    params.stats.kd = calcKD(params.stats)
+    params.stats.kda = calcKDA(params.stats)
+
+    let payload = JSON.parse(`{
+        "steamId": "${params.steamId}",
+        "nick":    "${params.name}",
+        "statsMap": {
+            "${params.map}": ${JSON.stringify(params.stats)}
         }
-    }`
-    return await (new schema.PlayerStats(JSON.parse(payload))).save()
+    }`)
+
+    return await (new schema.PlayerStats(payload)).save()
+}
+
+function calcKD(stats) {
+    return stats.kill / stats.deaths
+}
+
+function calcKDA(stats) {
+    return (stats.kill + stats.assists) / stats.deaths
 }
 
 async function findMapById(mapId) {
     return await schema.Maps.findOne({value: mapId}).exec()
+}
+
+async function statsPlayerDiscordId(discordId) {
+    return await schema.PlayerStats.findOne({ discordId }).exec()
 }
 
 async function updateStatusMatch(params) {
@@ -241,6 +262,7 @@ export default {
     deleteMatchTemp,
     saveStatsPlayer,
     updateStatusMatch,
+    statsPlayerDiscordId,
     listExecByMap,
     saveExecListByMap,
     findMapById,

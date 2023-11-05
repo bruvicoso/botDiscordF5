@@ -2,13 +2,17 @@ import { SlashCommandBuilder } from "discord.js"
 import Repository from './../database/repository.js'
 
 export default (async () => {
-  await Repository.getAllMaps()
+  return await Repository.getAllMaps()
   .then(mapsName => {
     mapsName = JSON.parse(JSON.stringify(mapsName))
 
     const ListMaps = new SlashCommandBuilder()
     .setName("list_maps")
-    .setDescription("Send the statistics")
+    .setDescription("Send the maps statistics")
+
+    const StatsPlayer = new SlashCommandBuilder()
+    .setName("stats")
+    .setDescription("Send the player statistics")
 
     const MapStatus = new SlashCommandBuilder()
       .setName("map")
@@ -104,7 +108,8 @@ export default (async () => {
       BindAdd,
       Exec,
       ExecList,
-      ListMaps
+      ListMaps,
+      StatsPlayer
     ]
   })
 })()

@@ -48,6 +48,31 @@ function EmbedTotalByYear(params) {
     .setThumbnail(params.winrate >= 50 ? thumbPositive : thumbNegative)
 }
 
+function EmbedPlayer(player, tagDiscord) {
+    let objMaps = []
+    Object.entries(player.statsMap).forEach(([map, stats]) => {  
+        objMaps = [...objMaps,
+            { name: `*${map}*`, value: ` `, inline: true },
+            { name: ' ', value: `*${stats.kills} / ${stats.assists} / ${stats.deaths}*`, inline: true },
+            { name: ' ', value: `*${stats.kd} / ${stats.kda}*`, inline: true },
+        ]
+    })
+
+    return new EmbedBuilder()
+        .setTitle(`${tagDiscord} - Estatística 2023`)
+        .setDescription('As estatísticas estão ordenadas por KDA')
+        .setColor(alertColor)
+        .setFields(
+            { name: 'Map', value: ' ', inline: true },
+            { name: 'K / A / D', value: ' ', inline: true },
+            { name: 'KD / KDA', value: ' ', inline: true },
+            ...objMaps
+        )
+        .setFooter(
+            { text: 'Limite de 7 linhas!'}
+        )
+}
+
 function ShowBind(params) {
     return new EmbedBuilder()
         .setColor(alertColor)
@@ -84,4 +109,4 @@ function EmbedExec(mapName, execs) {
     )
 }
 
-export default { EmbedMatch, EmbedTotalByYear, EmbedExec, ShowBind }
+export default { EmbedMatch, EmbedTotalByYear, EmbedPlayer, EmbedExec, ShowBind }

@@ -37,17 +37,19 @@ const client = new Client({
 
 client.on('ready', () => {
   console.log("Bot online 🚀")
-  GSI.wsGame(client)
+  // GSI.wsGame(client)
 });
 
 client.on('interactionCreate', async interaction => {
   if (interaction.isButton()) {
-
     if (interaction.message) {
-      await interaction.message.delete();
+      await interaction.message.delete()
+        .catch((err) => console.log('[WARNING] Could not delete the message', err));
     }
     const buttonId = interaction.customId.split('-')[0]
     const matchId = interaction.customId.split('-')[1]
+
+    client.user.setPresence({ activity: null })
 
     if (buttonId === 'confirm') {
       try {
@@ -68,7 +70,7 @@ client.on('interactionCreate', async interaction => {
           content: `${params.status.toUpperCase()} no mapa ${params.mapId} atualizado!`,
           embeds: [embedCustom.EmbedMatch(
             await Repository.getMatchs()
-          )] 
+          )]
         })
         .catch(collected => {
           return interaction.reply({
@@ -85,6 +87,7 @@ client.on('interactionCreate', async interaction => {
     Repository.deleteMatchTemp(matchId)
     return;
   }
+  
   if (!interaction.isChatInputCommand()) return;
 
   if (interaction.commandName === 'list_maps') {
@@ -148,10 +151,21 @@ client.on('interactionCreate', async interaction => {
     }
   }
 
+  if (interaction.commandName === 'stats') {
+    const player = await Repository.statsPlayerDiscordId(interaction.user.id)
+    if (player) {
+      return await interaction.reply({
+        embeds: [embedCustom.EmbedPlayer(player, interaction.user.tag)] 
+      });
+    }
+
+    await interaction.reply({content: `Jogador não encontrado!`});
+  }
+
   if (interaction.commandName === 'resume') {
     const resume = await Repository.resumeByYear()
     await interaction.reply({
-        content: `Autodestruição em 30s`,
+        content: `A mensagem será apagada em 30s`,
         embeds: [embedCustom.EmbedTotalByYear(resume)]
       })
       .then(() => {
@@ -167,12 +181,9 @@ client.on('interactionCreate', async interaction => {
 
     if (randomBind) {
       await interaction.reply({
-        content: `Autodestruição em 30s`,
         embeds: [
           embedCustom.ShowBind(randomBind)
         ]
-      }).then(() => {
-        setTimeout(() => interaction.deleteReply(), 30000)
       })
       .catch(collected => {
         message.reply('Ocorreu um erro');

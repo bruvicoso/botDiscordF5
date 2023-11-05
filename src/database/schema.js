@@ -31,17 +31,9 @@ const MatchsApproveSchema = new Schema({
 }, { timestamp: true })
 
 const PlayerStatsSchema = new Schema({
-    steamId:   {type: String, require: true},
-    nick:      {type: String, require: true},
-    statsMaps: {
-        map: {
-            kills:   {type: Number, require: true},
-            deaths:  {type: Number, require: true},
-            assists: {type: Number, require: true},
-            mvps:    {type: Number, require: true},
-            score:   {type: String, require: false},
-        }
-    }
+    steamId:   {type: String, require: false},
+    nick:      {type: String, require: false},
+    statsMap:  {type: Object, require: true}
 }, { timestamp: true })
 
 const mapSchema = new Schema({

@@ -4,4 +4,8 @@ function validateUrl(value) {
   );
 }
 
+function logDateNow() {
+  console.log(new Date().toISOString().replace('T', ' ').substring(0, 19))
+}
+
 export default { validateUrl }
