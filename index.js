@@ -37,7 +37,7 @@ const client = new Client({
 
 client.on('ready', () => {
   console.log("Bot online 🚀")
-  // GSI.wsGame(client)
+  GSI.wsGame(client)
 });
 
 client.on('interactionCreate', async interaction => {
@@ -252,23 +252,23 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-client.on('messageReactionAdd', (reaction, user) => {
+// client.on('messageReactionAdd', (reaction, user) => {
   // if (reaction.message.content == '<@&913202088647999538>') {}
-  console.log('Count: ', reaction.count)
-  console.log(reaction)
+  // console.log('Count: ', reaction.count)
+  // console.log(reaction)
 
-  let countReactions = 0
+  // let countReactions = 0
 
-  reaction.message.awaitReactions({ max: 2, time: 60000, errors: ['time'] })
-	.then(collected => {
-		// const reaction = collected.first();
-    console.log('collected', collected)
-		countReactions++
-    console.log(countReactions)
-	})
-	.catch(collected => {
-		message.reply('you reacted with neither a thumbs up, nor a thumbs down.');
-	});
+  // reaction.message.awaitReactions({ max: 2, time: 60000, errors: ['time'] })
+	// .then(collected => {
+	// 	// const reaction = collected.first();
+  //   console.log('collected', collected)
+	// 	countReactions++
+  //   console.log(countReactions)
+	// })
+	// .catch(collected => {
+	// 	message.reply('you reacted with neither a thumbs up, nor a thumbs down.');
+	// });
 
 
   // let count = 1
@@ -277,7 +277,7 @@ client.on('messageReactionAdd', (reaction, user) => {
   //   console.log(react.message.content)
   // }))
   // console.log(`O usuário com o ID ${user.id} reagiu à mensagem com a reação: ${reaction.emoji.name}`);
-});
+// });
 
 // client.on('messageReactionRemove', (reaction, user) => {
 //   console.log(reaction.message.content == '@cs')
