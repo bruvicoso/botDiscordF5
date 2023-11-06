@@ -41,7 +41,7 @@ async function wsGame(client = false) {
 
                         if (client) {
                             client.user.setActivity({
-                                name: `Round ${body.map?.round}: CT ${scoreCT} - TR ${scoreTR}`
+                                name: ` - ${body.map?.name} | Round ${body.map?.round}: CT ${scoreCT} - TR ${scoreTR}`
                             })
                         }
                     }
