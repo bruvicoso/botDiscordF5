@@ -93,8 +93,8 @@ async function wsGame(client = false) {
 
                         if (cache.has(body.provider.steamid)) {
                             const session = cache.get(body.provider.steamid)
+                            cache.del(body.provider.steamid)
                             if (session.stats) {
-                                cache.del(body.provider.steamid)
                                 let cachePayload = {
                                     steamId: body.provider.steamid,
                                     name: session.name,

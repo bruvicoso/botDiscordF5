@@ -140,11 +140,11 @@ async function saveStatsPlayer(params) {
 }
 
 function calcKD(stats) {
-    return stats.kill / stats.deaths
+    return stats.kills / stats.deaths
 }
 
 function calcKDA(stats) {
-    return (stats.kill + stats.assists) / stats.deaths
+    return (stats.kills + stats.assists) / stats.deaths
 }
 
 async function findMapById(mapId) {
